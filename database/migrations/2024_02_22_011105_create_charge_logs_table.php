@@ -11,11 +11,12 @@ return new class extends Migration
 	 */
 	public function up(): void
 	{
-		Schema::create('payments', function (Blueprint $table) {
+		Schema::create('charge_logs', function (Blueprint $table) {
 			$table->id();
-			$table->string('shop_id', 4)->comment('ショップコード');
-			$table->string('customer_id')->comment('顧客ID');
-			$table->string('amount', 7)->comment('金額');
+			$table->string('charge_id')->comment('決済ID');
+			$table->string('status')->comment('失敗と成功');
+			$table->string('amount')->comment('金額');
+			$table->string('payment_code')->comment('決済コード (店舗Code - 顧客ID - unixtime)');
 			$table->timestamps();
 		});
 	}
@@ -25,6 +26,6 @@ return new class extends Migration
 	 */
 	public function down(): void
 	{
-		Schema::dropIfExists('payments');
+		Schema::dropIfExists('charge_logs');
 	}
 };
