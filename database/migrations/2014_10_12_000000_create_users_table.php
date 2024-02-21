@@ -14,7 +14,7 @@ return new class extends Migration
 		Schema::create('users', function (Blueprint $table) {
 			$table->id();
 			$table->string('name');
-			$table->string('shop_id', 4)->nullable()->comment('4桁のユニークID');
+			$table->string('shop_code', 4)->nullable()->comment('4桁のユニークID');
 			$table->string('domain')->comment('契約ドメイン');
 			$table->string('email')->unique()->comment('メアド');
 			$table->timestamp('email_verified_at')->nullable();
