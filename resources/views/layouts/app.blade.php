@@ -11,11 +11,16 @@
 	<link rel="stylesheet" href="{{ asset('css/main.css') }}?=newer">
 
 	@yield('addStyle')
+	<style>
+		body{
+			background-color: #111827;
+		}
+	</style>
 </head>
 <body>
 	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="{{ url('/') }}">もへもへもー</a>
+			<a class="navbar-brand" href="{{ url('/') }}">SSPDR</a>
 			<div class="ml-auto">
 				<a href="{{ route('login') }}" class="btn btn-secondary">Login</a>
 				<a href="{{ route('register') }}" class="btn btn-secondary">register</a>
@@ -36,12 +41,6 @@
 	@yield('content')
 	</main>
 
-	<footer class="text-center mt-5">
-		<a href={{ url('/') }}" class="text-center">
-			Footer
-		</a>
-		<p class="text-center">@ 2023 運営委員会 All rights reserved.</p>
-	</footer>
 	<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js"></script>
 	@yield('addSomething')
