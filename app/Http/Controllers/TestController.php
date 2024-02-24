@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use MyStripe;
 
 class TestController extends Controller
 {
@@ -13,14 +14,9 @@ class TestController extends Controller
 
 	public function makeToken(Request $request)
 	{
-		dd($request, $request->stripeToken);
-		$stripe = new \Stripe\StripeClient("env('STRIPE_TEST_SECRET')");
-		$stripe->charges->create([
-			'amount' => 1099,
-			'currency' => 'jpy',
-			'source' => $request->stripeToken,
-		]);
-
-		dd($request->stripeToken);
+		$stripeFanc = new \App\Lib\StripeFanc();
+		$result = $stripeFanc->charge($request->stripeToken, 1200);
+		dd($result);
+		return $stripe;
 	}
 }
