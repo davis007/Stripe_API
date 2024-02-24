@@ -3,57 +3,106 @@
 
 @section('content')
 <div class="content text-white">
-	{{ env('STRIPE_TEST_SECRET') }}
-	<form method="POST" action="{{ url('test/payment') }}">
-		@csrf
-		<div class="form-group">
-			<label for="number">カード番号</label>
-			<input type="text" class="form-control" id="number" placeholder="1234 5678 9012 3456" value="4242424242424242">
-		</div>
-		<div class="row">
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="cardExpirationMonth">有効期限（月）</label>
-					<select class="form-control" id="cardExpirationMonth" name="exp_month">
-						<option value="">月を選択</option>
-						<option value="1">01</option>
-						<option value="2">02</option>
-						<option value="3">03</option>
-						<option value="4">04</option>
-						<option value="5" selected>05</option>
-						<option value="6">06</option>
-						<option value="7">07</option>
-						<option value="8">08</option>
-						<option value="9">09</option>
-						<option value="10">10</option>
-						<option value="11">11</option>
-						<option value="12">12</option>
-					</select>
+	<h1>Payment</h1>
+
+	<div class="col-6 card bg-dark">
+		<div class="card-header">Stripe決済</div>
+		<div class="card-body">
+			<form id="card-form" action="{{ url('test/payment') }}" method="POST">
+				@csrf
+				<div>
+					<label for="card_number">カード番号</label>
+					<div id="card-number" class="form-control"></div>
 				</div>
-			</div>
-			<div class="col-md-6">
-				<div class="form-group">
-					<label for="cardExpirationYear">有効期限（年）</label>
-					<select class="form-control" id="cardExpirationYear" name="exp_year">
-						<option value="">年を選択</option>
-						<option value="2023">2023</option>
-						<option value="2024">2024</option>
-						<option value="2025">2025</option>
-						<option value="2026">2026</option>
-						<option value="2027">2027</option>
-						<option value="2028" selected>2028</option>
-						<option value="2029">2029</option>
-						<option value="2030">2030</option>
-					</select>
+
+				<div>
+					<label for="card_expiry">有効期限</label>
+					<div id="card-expiry" class="form-control"></div>
 				</div>
-			</div>
+
+				<div>
+					<label for="card-cvc">セキュリティコード</label>
+					<div id="card-cvc" class="form-control"></div>
+				</div>
+
+				<div id="card-errors" class="text-danger"></div>
+
+				<button class="mt-3 btn btn-primary">支払い</button>
+			</form>
 		</div>
-		<div class="form-group">
-			<label for="cardCVC">CVC</label>
-			<input type="text" class="form-control" id="cardCVC" placeholder="CVC" name="cvc" value="314">
-		</div>
-		<button type="submit" class="btn btn-primary">支払う</button>
-	</form>
+	</div>
+
 </div>
+
+@endsection
+@section('addSomething')
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+	const stripe = Stripe('{{ env('STRIPE_KEY_TEST') }}');
+	const elements = stripe.elements();
+
+	var cardNumber = elements.create('cardNumber');
+	cardNumber.mount('#card-number');
+	cardNumber.on('change', function (event) {
+		var displayError = document.getElementById('card-errors');
+		if (event.error) {
+			displayError.textContent = event.error.message;
+		} else {
+			displayError.textContent = '';
+		}
+	});
+
+	var cardExpiry = elements.create('cardExpiry');
+	cardExpiry.mount('#card-expiry');
+	cardExpiry.on('change', function (event) {
+		var displayError = document.getElementById('card-errors');
+		if (event.error) {
+			displayError.textContent = event.error.message;
+		} else {
+			displayError.textContent = '';
+		}
+	});
+
+	var cardCvc = elements.create('cardCvc');
+	cardCvc.mount('#card-cvc');
+	cardCvc.on('change', function (event) {
+		var displayError = document.getElementById('card-errors');
+		if (event.error) {
+			displayError.textContent = event.error.message;
+		} else {
+			displayError.textContent = '';
+		}
+	});
+
+	var form = document.getElementById('card-form');
+	form.addEventListener('submit', function (event) {
+		event.preventDefault();
+		var errorElement = document.getElementById('card-errors');
+		if (event.error) {
+			errorElement.textContent = event.error.message;
+		} else {
+			errorElement.textContent = '';
+		}
+
+		stripe.createToken(cardNumber).then(function (result) {
+			if (result.error) {
+				errorElement.textContent = result.error.message;
+			} else {
+				stripeTokenHandler(result.token);
+			}
+		});
+	});
+
+	function stripeTokenHandler(token) {
+		var form = document.getElementById('card-form');
+		var hiddenInput = document.createElement('input');
+		hiddenInput.setAttribute('type', 'hidden');
+		hiddenInput.setAttribute('name', 'stripeToken');
+		hiddenInput.setAttribute('value', token.id);
+		form.appendChild(hiddenInput);
+		form.submit();
+	}
+
+</script>
 
 @endsection
