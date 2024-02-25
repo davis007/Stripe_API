@@ -16,7 +16,15 @@ class TestController extends Controller
 	{
 		$stripeFanc = new \App\Lib\StripeFanc();
 		$result = $stripeFanc->charge($request->stripeToken, 1200);
-		dd($result);
-		return $stripe;
+		return $result;
+	}
+
+	public function refund(Request $req)
+	{
+		if ($req->PaymentID) {
+			$stripeFanc = new \App\Lib\StripeFanc();
+			$result = $stripeFanc->refund($req->PaymentID);
+			return $result;
+		}
 	}
 }

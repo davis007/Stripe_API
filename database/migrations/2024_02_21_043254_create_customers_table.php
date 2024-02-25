@@ -15,6 +15,7 @@ return new class extends Migration
 			$table->id();
 			$table->string('name');
 			$table->string('customer_id')->nullable()->comment('顧客ID');
+			$table->string('shopCode')->comment('店舗コード');
 			$table->string('email')->unique()->comment('メアド');
 			$table->timestamps();
 		});

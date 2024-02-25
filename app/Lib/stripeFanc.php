@@ -36,6 +36,7 @@ class StripeFanc
 					'enabled' => true,
 					'allow_redirects' => 'never',
 				],
+				'metadata' => ['order_id' => '6735'],
 			]);
 
 			return $paymentIntent->id;
@@ -54,12 +55,19 @@ class StripeFanc
 	 * 		requested_by_customer, お客様の申し出
 	 * 		abandoned 放棄
 	 **/
-	public static function refund($chargeId, $reason = null)
+	public function refund($chargeId, $reason = null)
 	{
-		if (!is_null($reason)) {
-			$params['cancellation_reason'] = $reason;
+		$params = [];
+		if (is_null($reason)) {
+			$reason = '記載なし';
 		}
-		$refund = $stripe->paymentIntents->cancel($chargeId, $params);
+		$refund = $this->stripe->refunds->create([
+			'payment_intent' => $chargeId,
+			'metadata' => ['reason' => $reason],
+		]);
+
+		dd($refund);
+		return $refund;
 	}
 
 	public static function createCustomer($email, $token)

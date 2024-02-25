@@ -21,6 +21,7 @@ Route::get('/', function () {
 Route::prefix('test')->group(function () {
 	Route::get('payment', [TestController::class, 'payment']);
 	Route::post('payment', [TestController::class, 'makeToken']);
+	Route::get('refund', [TestController::class, 'refund']);
 });
 
 
