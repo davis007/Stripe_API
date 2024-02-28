@@ -70,11 +70,30 @@ class StripeFanc
 		return $refund;
 	}
 
-	public static function createCustomer($email, $token)
+	// 単純にユーザー生成するだけ
+	public function createCustomer($name, $email, $meta)
 	{
-		$customer = \Stripe\Customer::create([
+		$customer = $this->stripe->customers->create([
+			'name' => $name,
 			'email' => $email,
-			'source' => $token,
+			['metadata' => ['shop_code' => $meta]],
 		]);
+
+		dd($customer);
+		return $customer;
+	}
+
+	// ユーザー生成とカード割り当て
+	public function customerAndCard($name, $email, $source, $meta)
+	{
+		$customer = $this->stripe->customers->create([
+			'name' => $name,
+			'email' => $email,
+			'source' => $source,
+			['metadata' => ['shop_code' => $meta]],
+		]);
+
+		dd($customer);
+		return $customer;
 	}
 }

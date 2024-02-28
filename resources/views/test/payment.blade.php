@@ -3,13 +3,44 @@
 
 @section('content')
 <div class="content text-white">
-	<h1>Payment</h1>
 
 	<div class="col-6 card bg-dark">
-		<div class="card-header">Stripe決済</div>
+		<div class="card-header"><h2>Payment</h2></div>
 		<div class="card-body">
-			<form id="card-form" action="{{ url('test/payment') }}" method="POST">
+			<form id="card-form" action="{{ url('test/payment') }}" method="POST" lang="ja">
 				@csrf
+
+				<!-- 登録のみ / 決済のラジオボタン -->
+				<div class="form-group">
+					<label>登録オプション</label>
+					<div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" name="registration_option" id="registrationOnly" value="registrationOnly" checked>
+							<label class="form-check-label" for="registrationOnly" value="regist_only">登録のみ</label>
+						</div>
+						<div class="form-check form-check-inline">
+							<input class="form-check-input" type="radio" name="registration_option" id="payment" value="payment">
+							<label class="form-check-label" for="payment">決済</label>
+						</div>
+					</div>
+				</div>
+
+				<!-- ユーザー名 -->
+				<div class="form-group">
+					<label for="user_name">ユーザー名</label>
+					<input type="text" class="form-control" id="user_name" name="user_name" placeholder="user_name">
+				</div>
+				<!-- メールアドレス -->
+				<div class="form-group">
+					<label for="mailaddress">メールアドレス</label>
+					<input type="text" class="form-control" id="mailaddress" name="mailaddress" placeholder="email">
+				</div>
+				<!-- 決済金額入力 -->
+				<div class="form-group">
+					<label for="payment_amount">決済金額 (JPY)</label>
+					<input type="number" class="form-control" id="payment_amount" name="amount" placeholder="金額を入力(円)">
+				</div>
+
 				<div>
 					<label for="card_number">カード番号</label>
 					<div id="card-number" class="form-control"></div>
@@ -27,7 +58,7 @@
 
 				<div id="card-errors" class="text-danger"></div>
 
-				<button class="mt-3 btn btn-primary">支払い</button>
+				<button class="mt-3 btn btn-primary ">支払い</button>
 			</form>
 		</div>
 	</div>
