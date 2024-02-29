@@ -13,6 +13,7 @@ class TestController extends Controller
 		return view('test.payment');
 	}
 
+
 	// 顧客登録 view
 	public function customer()
 	{

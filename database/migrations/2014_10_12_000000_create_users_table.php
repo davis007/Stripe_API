@@ -15,6 +15,7 @@ return new class extends Migration
 			$table->id();
 			$table->string('name');
 			$table->string('shop_code', 4)->nullable()->comment('4桁のユニークID');
+			$table->string('api_key')->unique()->nullable();
 			$table->string('domain')->comment('契約ドメイン');
 			$table->string('email')->unique()->comment('メアド');
 			$table->timestamp('email_verified_at')->nullable();
