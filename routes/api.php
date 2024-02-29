@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -15,6 +16,14 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::middleware('api_key')->get('/user', function (Request $request) {
-	// 認証されたルート
+// APIキー認証ミドルウェアを適用したルートグループ
+Route::middleware('api_key')->group(function () {
+	// 認証テスト 成功するとmessage:Hello!が帰ってくる
+	Route::get('/hello', [ApiController::class, 'hello']);
+	// カード登録
+	// カード決済
+	// カード与信
+	// 顧客登録
+	// カード登録＆顧客新規登録
+	// 決済取消し(返金)
 });

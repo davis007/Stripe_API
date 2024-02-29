@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -64,11 +65,44 @@ class RegisterController extends Controller
 	 */
 	protected function create(array $data)
 	{
-		return User::create([
-			'name' => $data['name'],
-			'email' => $data['email'],
-			'domain' => $data['domain'],
-			'password' => Hash::make($data['password']),
-		]);
+		$attempt = 0;
+		$maxAttempts = 10; // 最大試行回数を設定
+
+		do {
+			$shop_code = $this->generateRandomString(4); // 4文字のランダムな英数字を生成
+			$exists = User::where('shop_code', $shop_code)->exists(); // 生成したshop_codeがユニークかチェック
+			$attempt++;
+			if ($attempt > $maxAttempts) {
+				throw new \Exception('shop_code の生成に失敗しました。');
+			}
+		} while ($exists);
+
+		try {
+			$user = User::create([
+				'name' => $data['name'],
+				'email' => $data['email'],
+				'domain' => $data['domain'],
+				'shop_code' => $shop_code,
+				'api_key' => Str::uuid()->toString(),
+				'password' => Hash::make($data['password']),
+			]);
+
+			return $user;
+		} catch (\Exception $e) {
+			// ここで例外処理を行う
+			// ログ記録やエラーレスポンスの送信など
+			return redirect()->back()->withErrors(['msg' => $e->getMessage()]);
+		}
+	}
+
+	private function generateRandomString($length = 4)
+	{
+		$characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$charactersLength = strlen($characters);
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $characters[random_int(0, $charactersLength - 1)];
+		}
+		return $randomString;
 	}
 }
