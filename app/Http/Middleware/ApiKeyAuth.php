@@ -26,6 +26,9 @@ class ApiKeyAuth
 			return response()->json(['error' => 'Invalid API Key'], 401);
 		}
 
+		// ユーザー情報を$requestオブジェクトに添付
+		$request->attributes->set('user', $user);
+
 		return $next($request);
 	}
 }

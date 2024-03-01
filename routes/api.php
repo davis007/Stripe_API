@@ -22,8 +22,8 @@ Route::middleware('api_key')->group(function () {
 	Route::get('/hello', [ApiController::class, 'hello']);
 	// カード登録
 	// カード決済
-	// カード与信
 	// 顧客登録
+	Route::post('/registCustomer', [ApiController::class, 'registCustomer']);
 	// カード登録＆顧客新規登録
 	// 決済取消し(返金)
 });

@@ -66,7 +66,7 @@ class StripeFanc
 			'metadata' => ['reason' => $reason],
 		]);
 
-		dd($refund);
+		//dd($refund);
 		return $refund;
 	}
 
@@ -76,24 +76,24 @@ class StripeFanc
 		$customer = $this->stripe->customers->create([
 			'name' => $name,
 			'email' => $email,
-			['metadata' => ['shop_code' => $meta]],
+			['metadata' => $meta],
 		]);
 
-		dd($customer);
+		//dd($customer);
 		return $customer;
 	}
 
 	// ユーザー生成とカード割り当て
-	public function customerAndCard($name, $email, $source, $meta)
+	public function customerAndCard($name, $email, $source, $meta = null)
 	{
 		$customer = $this->stripe->customers->create([
 			'name' => $name,
 			'email' => $email,
 			'source' => $source,
-			['metadata' => ['shop_code' => $meta]],
+			['metadata' => $meta],
 		]);
 
-		dd($customer);
+		//dd($customer);
 		return $customer;
 	}
 }

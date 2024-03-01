@@ -29,4 +29,8 @@ Route::prefix('test')->group(function () {
 
 Route::middleware('auth')->group(function () {
 	Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+	Route::get('/basics', [HomeController::class, 'basics']);
+	Route::get('/customers', [HomeController::class, 'customers']);
+	Route::get('/sales', [HomeController::class, 'sales']);
+	Route::get('/settings', [HomeController::class, 'settings']);
 });
