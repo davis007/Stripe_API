@@ -36,6 +36,7 @@
 							<a class="dropdown-item" href="{{ url('basics') }}">基本情報</a>
 							<a class="dropdown-item" href="{{ url('customers') }}">顧客データ</a>
 							<a class="dropdown-item" href="{{ url('sales') }}">売上データ</a>
+							<a class="dropdown-item" href="{{ url('logs') }}">APIログ</a>
 							<a class="dropdown-item" href="{{ url('settings') }}">設定</a>
 							<div class="dropdown-divider"></div>
 							<form action="{{ route('logout') }}" method="POST" class="px-4 py-3">

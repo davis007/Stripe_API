@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
 	Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 	Route::get('/basics', [HomeController::class, 'basics']);
 	Route::get('/customers', [HomeController::class, 'customers']);
+	Route::get('delete/customer/{customer_id}', [HomeController::class, 'deleteCustomer']);
 	Route::get('/sales', [HomeController::class, 'sales']);
 	Route::get('/settings', [HomeController::class, 'settings']);
 	Route::post('/regenerateApiKey', [HomeController::class, 'regenerateApiKey']);

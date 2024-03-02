@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\customer;
+use MyStripe;
 
 class HomeController extends Controller
 {
@@ -43,6 +44,23 @@ class HomeController extends Controller
 		$cust = customer::where(['shopCode' => $user->shop_code])->paginate(20);
 
 		return view('members.customers', compact('user', 'cust'));
+	}
+
+	public function deleteCustomer($customer_id)
+	{
+		$user = User::find(Auth::user()->id)->first();
+		// stripe customer delete 完了後にこっちのDBからも削除する
+		$stripeFanc = new \App\Lib\StripeFanc();
+		$del = $stripeFanc->deleteCustomer($customer_id);
+		if ($del->deleted) {
+			$cusDel = customer::where([
+				'shopCode' => $user->shop_code,
+				'customer_id' => $customer_id
+			])->delete();
+			return redirect()->back()->with('msg', '顧客情報が削除されました。サブスクもクレジットカード情報も削除されています。');
+		} else {
+			return redirect()->back()->with('msg', '顧客情報の削除に失敗しました。');
+		}
 	}
 
 	public function sales()

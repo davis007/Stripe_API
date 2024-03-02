@@ -83,6 +83,14 @@ class StripeFanc
 		return $customer;
 	}
 
+	// 顧客を削除
+	//その顧客の有効なサブスクリプションも直ちにキャンセルされます。
+	public function deleteCustomer($customer_id)
+	{
+		$del = $this->stripe->customers->delete($customer_id, []);
+		return $del;
+	}
+
 	// ユーザー生成とカード割り当て
 	public function customerAndCard($name, $email, $source, $meta = null)
 	{
