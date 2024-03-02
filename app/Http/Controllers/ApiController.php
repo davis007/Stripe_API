@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\customer;
+use App\Models\OperateLog;
 use MyStripe;
 
 class ApiController extends Controller

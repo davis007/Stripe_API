@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class OperateLog extends Model
 {
-    use HasFactory;
+	use HasFactory;
+	protected $guarded = ['id'];
 }
