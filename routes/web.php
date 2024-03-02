@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\HomeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -33,4 +34,5 @@ Route::middleware('auth')->group(function () {
 	Route::get('/customers', [HomeController::class, 'customers']);
 	Route::get('/sales', [HomeController::class, 'sales']);
 	Route::get('/settings', [HomeController::class, 'settings']);
+	Route::post('/regenerateApiKey', [HomeController::class, 'regenerateApiKey']);
 });

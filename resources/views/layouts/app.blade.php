@@ -34,7 +34,7 @@
 							<!-- ドロップダウンメニューの項目 -->
 							<a class="dropdown-item" href="{{ route('home') }}">HOME</a>
 							<a class="dropdown-item" href="{{ url('basics') }}">基本情報</a>
-							<a class="dropdown-item" href="{{ url('cunstomers') }}">顧客データ</a>
+							<a class="dropdown-item" href="{{ url('customers') }}">顧客データ</a>
 							<a class="dropdown-item" href="{{ url('sales') }}">売上データ</a>
 							<a class="dropdown-item" href="{{ url('settings') }}">設定</a>
 							<div class="dropdown-divider"></div>
