@@ -8,14 +8,27 @@
 				<div class="card-header">Customers</div>
 
 				<div class="card-body">
-					@if(session('status'))
+					@if(session('msg'))
 						<div class="alert alert-success" role="alert">
-							{{ session('status') }}
+							{{ session('msg') }}
 						</div>
 					@endif
-
+					<form action="{{ url('create/customer') }}" method="post">
+					@csrf
+						<div class="form-group">
+							<label for="name">名前</label>
+							<input type="text" class="form-control" id="name" name="name" placeholder="名前を入力してください">
+						</div>
+						<!-- メールアドレス入力フィールド -->
+						<div class="form-group">
+							<label for="mailaddress">メールアドレス</label>
+							<input type="email" class="form-control" id="mailaddress" name="mailaddress" placeholder="メールアドレスを入力してください">
+						</div>
+						<!-- 送信ボタン -->
+						<button type="submit" class="btn btn-primary">送信</button>
+					</form>
 					@if($cust)
-					<table class="table text-white table-striped">
+					<table class="table text-white table-striped mt-5">
 					@foreach ($cust as $cus)
 						<tr>
 							<td>{{ $cus->name }}</td>

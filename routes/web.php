@@ -36,4 +36,5 @@ Route::middleware('auth')->group(function () {
 	Route::get('/sales', [HomeController::class, 'sales']);
 	Route::get('/settings', [HomeController::class, 'settings']);
 	Route::post('/regenerateApiKey', [HomeController::class, 'regenerateApiKey']);
+	Route::post('create/customer', [HomeController::class, 'addCustomer']);
 });

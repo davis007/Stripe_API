@@ -30,12 +30,14 @@ class HomeController extends Controller
 	public function index()
 	{
 		$user = User::where(['id' => Auth::user()->id])->first();
+
 		return view('home', compact('user'));
 	}
 
 	public function basics()
 	{
 		$user = User::find(Auth::user()->id)->first();
+
 		return view('members.basics', compact('user'));
 	}
 
@@ -47,9 +49,46 @@ class HomeController extends Controller
 		return view('members.customers', compact('user', 'cust'));
 	}
 
+	public function addCustomer(Request $req)
+	{
+		$validatedData = $req->validate([
+			'name' => 'required', // nameは必須
+			'mailaddress' => 'required|email', // emailは必須であり、有効なメールアドレス形式であること
+		]);
+
+		try {
+			$stripeFanc = new \App\Lib\StripeFanc();
+			$result = $stripeFanc->createCustomer(
+				$req->name,
+				$req->mailaddress,
+				['type' => 'WebCreate'],
+			);
+
+			$cus = new customer;
+			$cus->shopCode = Auth::user()->shop_code;
+			$cus->name = $req->name;
+			$cus->email = $req->mailaddress;
+			$cus->customer_id = $result->id;
+			$cus->save();
+
+			// operate log
+			$log = new OperateLog;
+			$log->shop_code = Auth::user()->shop_code;
+			$log->type = 'web';
+			$log->operate = '顧客作成';
+			$log->memo = $result->id;
+			$log->save();
+			return redirect()->back()->with('msg', '顧客を制作しました。');
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			// Stripe APIのエラーを捕捉
+			return redirect()->back()->with('Stripeエラー: ', $e->getMessage());
+		}
+	}
+
 	public function deleteCustomer($customer_id)
 	{
 		$user = User::find(Auth::user()->id)->first();
+
 		// stripe customer delete 完了後にこっちのDBからも削除する
 		$stripeFanc = new \App\Lib\StripeFanc();
 		$del = $stripeFanc->deleteCustomer($customer_id);
@@ -58,8 +97,10 @@ class HomeController extends Controller
 				'shopCode' => $user->shop_code,
 				'customer_id' => $customer_id
 			])->delete();
+
 			return redirect()->back()->with('msg', '顧客情報が削除されました。サブスクもクレジットカード情報も削除されています。');
 		} else {
+
 			return redirect()->back()->with('msg', '顧客情報の削除に失敗しました。');
 		}
 	}
@@ -67,12 +108,14 @@ class HomeController extends Controller
 	public function sales()
 	{
 		$user = User::find(Auth::user()->id)->first();
+
 		return view('members.sales', compact('user'));
 	}
 
 	public function settings()
 	{
 		$user = User::find(Auth::user()->id)->first();
+
 		return view('members.settings', compact('user'));
 	}
 
@@ -81,6 +124,7 @@ class HomeController extends Controller
 		$user = User::find(Auth::user()->id)->first();
 		$user->api_key = Str::uuid()->toString();
 		$user->save();
+
 		return redirect()->back()->with('msg', 'APIキーを再生成しました。以前のKeyは利用出来ません。');
 	}
 }
