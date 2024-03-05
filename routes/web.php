@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\paymentController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,6 +20,8 @@ Auth::routes();
 Route::get('/', function () {
 	return view('welcome');
 });
+
+Route::get('payment/{shopCode}/{amount}/{userType}/{userId?}', [PaymentController::class, 'payment']);
 
 Route::prefix('test')->group(function () {
 	Route::get('payment', [TestController::class, 'payment']);
