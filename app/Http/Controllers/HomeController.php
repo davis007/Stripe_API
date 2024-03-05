@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\customer;
 use App\Models\OperateLog;
+use App\Models\payment;
 use MyStripe;
 
 class HomeController extends Controller
@@ -39,6 +40,14 @@ class HomeController extends Controller
 		$user = User::find(Auth::user()->id)->first();
 
 		return view('members.basics', compact('user'));
+	}
+
+	public function apiLogs()
+	{
+		$user = Auth::user();
+		$logs = OperateLog::where('shop_code', $user->shop_code)->paginate(20);
+
+		return view('members.logs', compact('logs'));
 	}
 
 	public function customers()
@@ -108,8 +117,9 @@ class HomeController extends Controller
 	public function sales()
 	{
 		$user = User::find(Auth::user()->id)->first();
+		$sales = payment::where('shop_id', $user->shop_code)->paginate(20);
 
-		return view('members.sales', compact('user'));
+		return view('members.sales', compact('user', 'sales'));
 	}
 
 	public function settings()

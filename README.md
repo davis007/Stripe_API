@@ -19,7 +19,15 @@
 
 ## カード登録
 
-api.domain.jp/payment/point/{shop_code}/{amount}/{userId}
-shopCode = 4 桁の SHOP コード
+api.domain.jp/api/payment/point/{amount}/{userId}
+[header]
+// shopCode = 4 桁の SHOP コード
+HEADER['X-SHOP-CODE' => shopcode,]
+
 amount = 金額
-userId = 購入者のユーザー ID 新規登録の場合は newuser
+userId = 購入者のユーザー ID
+
+{userId}
+新規登録の場合,newuser
+既存ユーザー決済,userPayment
+ゲスト決済,guest

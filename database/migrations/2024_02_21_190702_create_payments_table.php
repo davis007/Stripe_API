@@ -14,6 +14,7 @@ return new class extends Migration
 		Schema::create('payments', function (Blueprint $table) {
 			$table->id();
 			$table->string('shop_id', 4)->comment('ショップコード');
+			$table->string('payment_log')->comment('支払いID');
 			$table->string('customer_id')->comment('顧客ID');
 			$table->string('amount', 7)->comment('金額');
 			$table->timestamps();

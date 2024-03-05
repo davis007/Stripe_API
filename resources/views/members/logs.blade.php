@@ -5,7 +5,7 @@
 	<div class="row justify-content-center">
 		<div class="col-md-12">
 			<div class="card bg-dark text-white">
-				<div class="card-header">Sales</div>
+				<div class="card-header">API Logs</div>
 
 				<div class="card-body">
 					@if(session('msg'))
@@ -13,21 +13,25 @@
 							{{ session('msg') }}
 						</div>
 					@endif
-					@if($sales->isNotEmpty())
-					<table class="table text-white table-striped">
-					@foreach($sales as $sale)
+					@if(!$logs)
+					<p>データがありません</p>
+					@else
+					<table class="table table-striped text-white">
+					<tr>
+						<th>操作</th>
+						<th>目的</th>
+						<th>補足</th>
+						<th>時間</th>
+					</tr>
+					@foreach ($logs as $log)
 						<tr>
-							<td>{{ $sale->created_at->format('Y-m-d H:i') }}</td>
-							<td>{{ $sale->customer_id }}</td>
-							<td>{{ $sale->amount }}</td>
-							<td>
-								<a href="#delete" class="btn btn-danger confirms">返金</a>
-							</td>
+							<td>{{ $log->type }}</td>
+							<td>{{ $log->operate }}</td>
+							<td>{{ $log->memo ? $log->memo : '-' }}</td>
+							<td>{{ $log->created_at->format('Y-m-d H:i')}}</td>
 						</tr>
 					@endforeach
 					</table>
-					@else
-					<p class="text-white">売上データがありません。</p>
 					@endif
 				</div>
 			</div>
