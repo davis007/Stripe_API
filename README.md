@@ -30,5 +30,5 @@ payment/{shopCode}/{amount}/{userType}/{userId}
 決済だけ,guest
 
 {userId}
-8 桁のカスタマーコード
-購入者のユーザー 顧客登録した際に返却される 8 桁コード
+8 桁のカスタマー ID
+購入者のユーザー 顧客登録した際に返却される 8 桁 ID
