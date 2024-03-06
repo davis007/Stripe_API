@@ -184,6 +184,12 @@ return [
 	'aliases' => Facade::defaultAliases()->merge([
 		// 'Example' => App\Facades\Example::class,
 		'MyStripe' => App\Lib\stripeFanc::class,
+		'common' => App\Lib\common::class,
 	])->toArray(),
+
+
+	'files' => [
+		app_path('Http/helpers.php'),
+	],
 
 ];

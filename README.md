@@ -1,12 +1,11 @@
 # STRIPE API TOWER
 
-1. laravel sanctum を利用して認証
 1. Domain ホワイトリストで特定のドメインからしかアクセス出来ないようにしてます
 1. 完成後 PrivateRepository に変わります
 
 ## function
 
-1. カード決済(guest)
+1. カード決済
 1. 決済履歴
 1. 顧客登録
 1. 顧客一覧
@@ -17,14 +16,19 @@
 1. 決済取消し(返金)
 1.
 
-## カード登録
+## カード決済
 
 payment/{shopCode}/{amount}/{userType}/{userId}
 
+{shopCode} 4 桁のショップコード
+
 {amount} 金額
-{userId} 購入者のユーザー cus\_ から始まる ID
 
 {userType}
 登録と新規決済,newuser
 カード登録済ユーザー決済,userPayment
 決済だけ,guest
+
+{userId}
+8 桁のカスタマーコード
+購入者のユーザー 顧客登録した際に返却される 8 桁コード
