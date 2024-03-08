@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\paymentController;
+use App\Http\Controllers\PaymentController as ControllersPaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +23,7 @@ Route::get('/', function () {
 });
 
 Route::get('payment/{shopCode}/{amount}/{userType}/{userId?}', [PaymentController::class, 'payment']);
+Route::post('payment/newUser', [PaymentController::class, 'newUser']);
 
 Route::prefix('test')->group(function () {
 	Route::get('payment', [TestController::class, 'payment']);

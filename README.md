@@ -19,6 +19,7 @@
 ## カード決済
 
 payment/{shopCode}/{amount}/{userType}/{userId}
+payment/6JUR/3500/newuser/
 
 {shopCode} 4 桁のショップコード
 
