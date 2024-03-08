@@ -5,11 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\customer;
 use App\Models\OperateLog;
 use App\Models\payment;
+use App\Models\PlatCustomer;
 use MyStripe;
+use common;
 
 class HomeController extends Controller
 {
@@ -66,6 +69,7 @@ class HomeController extends Controller
 		]);
 
 		try {
+			DB::beginTransaction();
 			$stripeFanc = new \App\Lib\StripeFanc();
 			$result = $stripeFanc->createCustomer(
 				$req->name,
@@ -73,12 +77,19 @@ class HomeController extends Controller
 				['type' => 'WebCreate'],
 			);
 
+			$ccode = common::makeCustomerCode();
 			$cus = new customer;
 			$cus->shopCode = Auth::user()->shop_code;
+			$cus->customer_id = $ccode;
 			$cus->name = $req->name;
 			$cus->email = $req->mailaddress;
-			$cus->customer_id = $result->id;
 			$cus->save();
+
+			$plc = new PlatCustomer;
+			$plc->customer_id = $ccode;
+			$plc->plat_name = 'stripe';
+			$plc->plat_id = $result->id;
+			$plc->save();
 
 			// operate log
 			$log = new OperateLog;
@@ -87,9 +98,13 @@ class HomeController extends Controller
 			$log->operate = '顧客作成';
 			$log->memo = $result->id;
 			$log->save();
+
+			DB::commit();
+
 			return redirect()->back()->with('msg', '顧客を制作しました。');
 		} catch (\Stripe\Exception\ApiErrorException $e) {
 			// Stripe APIのエラーを捕捉
+			DB::rollBack();
 			return redirect()->back()->with('Stripeエラー: ', $e->getMessage());
 		}
 	}
@@ -106,6 +121,8 @@ class HomeController extends Controller
 				'shopCode' => $user->shop_code,
 				'customer_id' => $customer_id
 			])->delete();
+
+			$del = PlatCustomer::where(['customer_id' => $customer_id])->delete();
 
 			return redirect()->back()->with('msg', '顧客情報が削除されました。サブスクもクレジットカード情報も削除されています。');
 		} else {

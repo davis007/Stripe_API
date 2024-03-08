@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\customer;
 use App\Models\OperateLog;
+use App\Models\PlatCustomer;
 use MyStripe;
+use common;
 
 class ApiController extends Controller
 {
@@ -46,25 +49,45 @@ class ApiController extends Controller
 					'email' => $request->email,
 				],
 			);
+
+			$ccode = common::makeCustomerCode();
+
+			DB::beginTransaction();
+
 			$cus = new customer;
 			$cus->shopCode    = $user->shop_code;
 			$cus->name        = $request->name;
 			$cus->email       = $request->email;
-			$cus->customer_id = $result->id;
+			$cus->customer_id = $ccode;
 			$cus->save();
+
+			$plc = new PlatCustomer;
+			$plc->customer_id = $ccode;
+			$plc->plat_name = 'stripe';
+			$plc->plat_id = $result->id;
+			$plc->save();
+
+			// operate log
+			$log = new OperateLog;
+			$log->shop_code = $user->shop_code;
+			$log->type = 'api';
+			$log->operate = '顧客作成';
+			$log->memo = $result->id;
+			$log->save();
+
+			DB::commit();
 			return response()->json([
 				'success' => true,
 				'shopCode' => $user->shop_code,
 				'name' => $request->name,
 				'email' => $request->email,
-				'customer_id' => $result->id,
+				'customer_id' => $ccode,
 			]);
 		} catch (ApiErrorException $e) {
+			DB::rollBack();
+
 			return response()->json(['success' => false, 'error' => $e->getMessage()]);
 		}
-
-
-		return response()->json(['shop_code' => $user->shop_code]);
 	}
 	// カード登録＆顧客新規登録
 	// 決済取消し(返金)

@@ -14,7 +14,7 @@ return new class extends Migration
 		Schema::create('customers', function (Blueprint $table) {
 			$table->id();
 			$table->string('name');
-			$table->string('customer_id')->nullable()->comment('顧客ID');
+			$table->string('customer_id')->unique()->nullable()->comment('顧客ID');
 			$table->string('shopCode')->comment('店舗コード');
 			$table->string('email')->unique()->comment('メアド');
 			$table->timestamps();
