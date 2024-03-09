@@ -35,13 +35,13 @@ Route::prefix('test')->group(function () {
 
 
 Route::middleware('auth')->group(function () {
-	Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+	Route::get('/home', [HomeController::class, 'index'])->name('home');
 	Route::get('/basics', [HomeController::class, 'basics']);
 	Route::get('/customers', [HomeController::class, 'customers']);
+	Route::post('/create/customer', [HomeController::class, 'addCustomer']);
 	Route::get('delete/customer/{customer_id}', [HomeController::class, 'deleteCustomer']);
 	Route::get('/sales', [HomeController::class, 'sales']);
 	Route::get('/settings', [HomeController::class, 'settings']);
 	Route::post('/regenerateApiKey', [HomeController::class, 'regenerateApiKey']);
-	Route::post('/create/customer', [HomeController::class, 'addCustomer']);
 	Route::get('/logs', [HomeController::class, 'apiLogs']);
 });

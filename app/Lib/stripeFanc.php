@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\customer;
 use App\Models\OperateLog;
 use App\Models\payment;
+use common;
 
 class StripeFanc
 {
@@ -87,20 +88,18 @@ class StripeFanc
 	}
 
 	// 単純にユーザー生成するだけ
-	public function createCustomer($name, $email, $meta, $source = null)
+	public function createCustomer($name, $email, $source = null)
 	{
-		if ($source) {
+		if ($source != null) {
 			$customer = $this->stripe->customers->create([
 				'name' => $name,
 				'email' => $email,
 				'source' => $source,
-				['metadata' => $meta],
 			]);
 		} else {
 			$customer = $this->stripe->customers->create([
 				'name' => $name,
 				'email' => $email,
-				['metadata' => $meta],
 			]);
 		}
 

@@ -69,42 +69,19 @@ class HomeController extends Controller
 		]);
 
 		try {
-			DB::beginTransaction();
 			$stripeFanc = new \App\Lib\StripeFanc();
 			$result = $stripeFanc->createCustomer(
 				$req->name,
-				$req->mailaddress,
-				['type' => 'WebCreate'],
+				$req->mailaddress
 			);
 
+			$spc = Auth::user()->shop_code;
 			$ccode = common::makeCustomerCode();
-			$cus = new customer;
-			$cus->shopCode = Auth::user()->shop_code;
-			$cus->customer_id = $ccode;
-			$cus->name = $req->name;
-			$cus->email = $req->mailaddress;
-			$cus->save();
-
-			$plc = new PlatCustomer;
-			$plc->customer_id = $ccode;
-			$plc->plat_name = 'stripe';
-			$plc->plat_id = $result->id;
-			$plc->save();
-
-			// operate log
-			$log = new OperateLog;
-			$log->shop_code = Auth::user()->shop_code;
-			$log->type = 'web';
-			$log->operate = '顧客作成';
-			$log->memo = $result->id;
-			$log->save();
-
-			DB::commit();
+			$rst = common::addCustomerDB($req, $spc, $ccode, $result->id, 'stripe', 'web');
 
 			return redirect()->back()->with('msg', '顧客を制作しました。');
 		} catch (\Stripe\Exception\ApiErrorException $e) {
 			// Stripe APIのエラーを捕捉
-			DB::rollBack();
 			return redirect()->back()->with('Stripeエラー: ', $e->getMessage());
 		}
 	}

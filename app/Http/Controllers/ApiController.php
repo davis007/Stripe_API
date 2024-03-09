@@ -42,49 +42,21 @@ class ApiController extends Controller
 			$stripeFanc = new \App\Lib\StripeFanc();
 			$result = $stripeFanc->createCustomer(
 				$request->name,
-				$request->email,
-				[
-					'shop_code' => $user->shop_code,
-					'name' => $request->name,
-					'email' => $request->email,
-				],
+				$request->email
 			);
 
+			$spc = $user->shop_code;
 			$ccode = common::makeCustomerCode();
+			$rst = common::addCustomerDB($request, $spc, $ccode, $result->id, 'stripe', 'api');
 
-			DB::beginTransaction();
-
-			$cus = new customer;
-			$cus->shopCode    = $user->shop_code;
-			$cus->name        = $request->name;
-			$cus->email       = $request->email;
-			$cus->customer_id = $ccode;
-			$cus->save();
-
-			$plc = new PlatCustomer;
-			$plc->customer_id = $ccode;
-			$plc->plat_name = 'stripe';
-			$plc->plat_id = $result->id;
-			$plc->save();
-
-			// operate log
-			$log = new OperateLog;
-			$log->shop_code = $user->shop_code;
-			$log->type = 'api';
-			$log->operate = '顧客作成';
-			$log->memo = $result->id;
-			$log->save();
-
-			DB::commit();
 			return response()->json([
 				'success' => true,
-				'shopCode' => $user->shop_code,
+				'shopCode' => $spc,
 				'name' => $request->name,
 				'email' => $request->email,
 				'customer_id' => $ccode,
 			]);
 		} catch (ApiErrorException $e) {
-			DB::rollBack();
 
 			return response()->json(['success' => false, 'error' => $e->getMessage()]);
 		}
