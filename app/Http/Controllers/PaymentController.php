@@ -63,6 +63,7 @@ class PaymentController extends Controller
 		$validatedData = $req->validate([
 			'name' => 'required', // nameは必須
 			'mailaddress' => 'required|email', // emailは必須であり、有効なメールアドレス形式であること
+			'amount' => 'required|integer',
 		]);
 		try {
 			DB::beginTransaction();
@@ -73,6 +74,7 @@ class PaymentController extends Controller
 				[
 					'code' => $req->code
 				],
+				$req->stripeToken,
 			);
 			$ccode = common::makeCustomerCode();
 			$cus = new customer;

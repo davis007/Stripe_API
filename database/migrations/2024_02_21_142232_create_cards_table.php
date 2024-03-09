@@ -12,12 +12,8 @@ return new class extends Migration
 	public function up(): void
 	{
 		Schema::create('cards', function (Blueprint $table) {
-			$table->string('customer_id')->comment('Stripeの顧客ID');
-			$table->string('card_id')->comment('StripeのカードID');
-			$table->string('brand')->comment('カードブランド');
-			$table->string('last4')->comment('カード番号');
-			$table->string('exp_month')->comment('有効期限(月)');
-			$table->string('exp_year')->comment('有効期限(年)');
+			$table->string('customer_id')->nullable()->comment('8桁の顧客ID');
+			$table->string('card_id')->comment('8桁のカードID');
 			$table->timestamps();
 		});
 	}

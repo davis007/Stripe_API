@@ -1,102 +1,120 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Stripe Payment</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
 
-@section('content')
-<div class="container">
-	<div class="row justify-content-center">
-		<div class="col-md-8">
-			<div class="card">
-				<div class="card-header">決済ページ</div>
+<div class="container mt-5">
+    <form action="{{ url('payment/newUser') }}" method="post" id="payment-form">
+        @csrf
+        <input type="hidden" name="code" value="{{ $shop->shop_code }}">
 
-				<div class="card-body">
-					<form id="payment-form" method="post" action="{{ url('payment/newUser') }}">
-						@csrf
-						<input type="hidden" name="code" value="{{ $shop->shop_code }}">
+        <div class="form-group">
+            <label for="name">名前</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
 
-						<div class="form-group">
-							<label for="name">お名前</label>
-							<input type="text" id="name" class="form-control" required>
-						</div>
+        <div class="form-group">
+            <label for="email">メールアドレス</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+        </div>
 
-						<div class="form-group">
-							<label for="email">メールアドレス</label>
-							<input type="email" id="email" class="form-control" required>
-						</div>
+        <div class="form-group">
+            <label for="amount">購入価格</label>
+            <input type="text" class="form-control" id="amount" name="amount" value="{{ $amount }}" required>
+        </div>
 
-						<div class="form-group">
-							<label for="amount">購入価格</label>
-							<input type="number" id="amount" value="{{ $amount }}" class="form-control" disabled>
-						</div>
-
-						<div class="form-group">
-							<label for="card-element">クレジットカード情報を入力</label>
-							<div id="card-element"></div>
-						</div>
-
-						<div class="form-group">
-							<button type="submit" id="submit" class="btn btn-primary">支払う</button>
-						</div>
-
-						<div id="payment-message" class="hidden"></div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+        <!-- Stripeのカード情報入力欄: 分割表示 -->
+<div class="form-row">
+    <label for="card-number-element">
+        カード番号
+    </label>
+    <div id="card-number-element" class="form-control">
+      <!-- Stripe Card Number Element will be inserted here -->
+    </div>
 </div>
-@endsection
 
-@section('addSomething')
-<script src="https://js.stripe.com/v3/"></script>
+<div class="form-row">
+    <label for="card-expiry-element">
+        有効期限
+    </label>
+    <div id="card-expiry-element" class="form-control">
+      <!-- Stripe Card Expiry Element will be inserted here -->
+    </div>
+</div>
+
+<div class="form-row">
+    <label for="card-cvc-element">
+        CVC
+    </label>
+    <div id="card-cvc-element" class="form-control">
+      <!-- Stripe Card CVC Element will be inserted here -->
+    </div>
+</div>
+
+
+        <button class="btn btn-primary mt-4" type="submit">支払う</button>
+    </form>
+</div>
+
 <script>
-	var stripe = Stripe('{{ env('STRIPE_KEY_TEST') }}');
-	var elements = stripe.elements();
-	var cardElement = elements.create('card');
-	cardElement.mount('#card-element');
+    var stripe = Stripe('{{ env('STRIPE_KEY_TEST') }}');
+    var elements = stripe.elements();
 
-	var form = document.getElementById('payment-form');
-	form.addEventListener('submit', async (e) => {
-		e.preventDefault();
+    // Custom styling can be passed to options when creating an Element.
+    var style = {
+        base: {
+            // Add your base input styles here. For example:
+            fontSize: '16px',
+            color: '#32325d',
+        },
+    };
 
-		const {
-			paymentMethod,
-			error
-		} = await stripe.createPaymentMethod(
-			'card', cardElement, {
-				billing_details: {
-					name: document.getElementById('name').value,
-					email: document.getElementById('email').value
-				}
-			}
-		);
+    // Create an instance of the card Element for each piece of card information
+    var cardNumber = elements.create('cardNumber', {style: style});
+    var cardExpiry = elements.create('cardExpiry', {style: style});
+    var cardCvc = elements.create('cardCvc', {style: style});
 
-		if (error) {
-			document.getElementById('payment-message').classList.remove('hidden');
-			document.getElementById('payment-message').textContent = error.message;
-		} else {
-			fetch('/payment', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify({
-						payment_method_id: paymentMethod.id
-					})
-				})
-				.then(response => {
-					if (response.ok) {
-						document.getElementById('payment-message').classList.remove('hidden');
-						document.getElementById('payment-message').textContent = 'Payment successful!';
-					} else {
-						document.getElementById('payment-message').classList.remove('hidden');
-						document.getElementById('payment-message').textContent = 'Payment failed!';
-					}
-				})
-				.catch(error => {
-					document.getElementById('payment-message').classList.remove('hidden');
-					document.getElementById('payment-message').textContent = error.message;
-				});
-		}
-	});
+    // Mount the Elements to the DOM
+    cardNumber.mount('#card-number-element');
+    cardExpiry.mount('#card-expiry-element');
+    cardCvc.mount('#card-cvc-element');
 
+    // Handle form submission
+    var form = document.getElementById('payment-form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        stripe.createToken(cardNumber).then(function(result) {
+            if (result.error) {
+                // Inform the user if there was an error
+                console.log(result.error.message);
+            } else {
+                // Send the token to your server
+                stripeTokenHandler(result.token);
+            }
+        });
+    });
+
+    // Submit the form with the token ID
+    function stripeTokenHandler(token) {
+        var form = document.getElementById('payment-form');
+        var hiddenInput = document.createElement('input');
+        hiddenInput.setAttribute('type', 'hidden');
+        hiddenInput.setAttribute('name', 'stripeToken');
+        hiddenInput.setAttribute('value', token.id);
+        form.appendChild(hiddenInput);
+
+        // Submit the form
+        form.submit();
+    }
 </script>
-@endsection
+</script>
+
+</body>
+</html>

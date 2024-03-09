@@ -4,6 +4,12 @@ namespace App\Lib;
 
 use \Stripe\StripeClient;
 use Stripe\PaymentIntent;
+use Stripe\PaymentMethod;
+use App\Models\card;
+use App\Models\User;
+use App\Models\customer;
+use App\Models\OperateLog;
+use App\Models\payment;
 
 class StripeFanc
 {
@@ -14,12 +20,22 @@ class StripeFanc
 		$this->stripe = new StripeClient(env('STRIPE_TEST_SECRET'));
 	}
 
+	public function cardToken($token)
+	{
+		$payCard = $this->stripe->paymentMethods->create([
+			'type' => 'card',
+			'card' => ['token' => $token],
+		]);
+
+		return $payCard;
+	}
+
 	/**
 	 * 即時決済処理
 	 * $token: STRIPEから返却されたCardトークン tok_から始まるID
 	 * $amount: 決済額
 	 **/
-	public function charge($token, $amount)
+	public function charge($token, $amount, $meta = null)
 	{
 		try {
 			$paymentMethod = $this->stripe->paymentMethods->create([
@@ -36,7 +52,7 @@ class StripeFanc
 					'enabled' => true,
 					'allow_redirects' => 'never',
 				],
-				'metadata' => ['order_id' => '6735'],
+				'metadata' => $meta,
 			]);
 
 			return $paymentIntent->id;
@@ -71,13 +87,23 @@ class StripeFanc
 	}
 
 	// 単純にユーザー生成するだけ
-	public function createCustomer($name, $email, $meta)
+	public function createCustomer($name, $email, $meta, $source = null)
 	{
-		$customer = $this->stripe->customers->create([
-			'name' => $name,
-			'email' => $email,
-			['metadata' => $meta],
-		]);
+		if ($source) {
+			$customer = $this->stripe->customers->create([
+				'name' => $name,
+				'email' => $email,
+				'source' => $source,
+				['metadata' => $meta],
+			]);
+		} else {
+			$customer = $this->stripe->customers->create([
+				'name' => $name,
+				'email' => $email,
+				['metadata' => $meta],
+			]);
+		}
+
 
 		//dd($customer);
 		return $customer;
