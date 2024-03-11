@@ -101,7 +101,7 @@ class HomeController extends Controller
 
 			$del = PlatCustomer::where(['customer_id' => $customer_id])->delete();
 
-			return redirect()->back()->with('msg', '顧客情報が削除されました。サブスクもクレジットカード情報も削除されています。');
+			return redirect()->back()->with('msg', '顧客情報が削除されました。');
 		} else {
 
 			return redirect()->back()->with('msg', '顧客情報の削除に失敗しました。');
