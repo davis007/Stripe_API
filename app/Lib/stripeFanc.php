@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\customer;
 use App\Models\OperateLog;
 use App\Models\payment;
+use App\Models\PlatCard;
 use common;
 
 class StripeFanc
@@ -114,7 +115,7 @@ class StripeFanc
 	}
 
 	// 顧客支払いヒモ付け
-	public function attachSetupIntents($shopCode, $customer_id, $stripeToken)
+	public function attachSetupIntents($shopCode, $customer_id, $stripeToken, $ccode)
 	{
 		try {
 			$setupIntent = $this->stripe->setupIntents->create([
@@ -126,14 +127,37 @@ class StripeFanc
 				'type' => 'card',
 				'card' => ['token' => $stripeToken],
 			]);
+			$pid       = $paymentMethod->id;
+			$cards = $paymentMethod->card;
+			$exp_month = $cards->exp_month;
+			$exp_year = $cards->exp_year;
+			$last4 = $cards->last4;
+			$brand = $cards->brand;
 
 			// SetupIntentにPaymentMethodを関連付ける
 			$setupIntent = $this->stripe->setupIntents->confirm(
 				$setupIntent->id,
 				['payment_method' => $paymentMethod->id]
 			);
+
 			// operateLog記録
 			common::atLog($shopCode, 'web', '顧客＆カード制作', $setupIntent->id);
+			// card情報を保存
+			$cardc = common::makeCardCode();
+			$card = new card;
+			$card->customer_id = $ccode;
+			$card->card_id     = $cardc;
+			$card->save();
+
+			$pcard = new PlatCard;
+			$pcard->card_id   = $cardc;
+			$pcard->plat_name = 'stripe';
+			$pcard->plat_card = $pid;
+			$pcard->brand     = $brand;
+			$pcard->last4     = $last4;
+			$pcard->exp_month = $exp_month;
+			$pcard->exp_year  = $exp_year;
+			$pcard->save();
 
 			return $paymentMethod;
 		} catch (\Stripe\Exception\ApiErrorException $e) {

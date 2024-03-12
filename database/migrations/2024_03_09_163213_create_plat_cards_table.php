@@ -13,6 +13,7 @@ return new class extends Migration
 	{
 		Schema::create('plat_cards', function (Blueprint $table) {
 			$table->id();
+			$table->string('customer_id')->comment('customersに保存したcustomer識別ID');
 			$table->string('card_id')->comment('cardsに保存したカード識別ID');
 			$table->string('plat_name')->comment('stripeなどのプラットフォーム名');
 			$table->string('plat_card')->comment('platformから割り振られた固有ID');

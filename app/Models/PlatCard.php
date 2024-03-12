@@ -7,5 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PlatCard extends Model
 {
-    use HasFactory;
+	use HasFactory;
+
+	protected $guarded = ['id'];
 }

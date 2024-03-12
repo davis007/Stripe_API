@@ -82,7 +82,7 @@ class PaymentController extends Controller
 			$adcus = common::addCustomerDB($req, $req->code, $ccode, $result->id, 'stripe', 'web');
 
 			// 顧客にカード情報ヒモ付け
-			$atcard = $stripeFanc->attachSetupIntents($req->code, $result->id, $req->input('stripeToken'));
+			$atcard = $stripeFanc->attachSetupIntents($req->code, $result->id, $req->input('stripeToken'), $ccode);
 			DB::commit();
 
 			// 決済処理
