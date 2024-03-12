@@ -67,11 +67,6 @@
 					card: cardElement,
 					billing_details: {
 						email: document.getElementById('email').value
-
-
-
-
-
 					}
 				}
 			}

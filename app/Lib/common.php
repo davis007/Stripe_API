@@ -16,7 +16,6 @@ class common
 	public static function addCustomerDB($req, $spc, $ccode, $resultId, $plat, $where)
 	{
 		try {
-			DB::beginTransaction();
 			$cus = new customer;
 			$cus->shopCode = $spc;
 			$cus->customer_id = $ccode;
@@ -37,15 +36,31 @@ class common
 			$log->operate = '顧客作成';
 			$log->memo = $resultId;
 			$log->save();
-
-			DB::commit();
 		} catch (\Exception $e) {
-			DB::rollBack();
 			// エラー処理を追加する
 			// 例: Log::error($e->getMessage());
 			throw $e;
 		}
 	}
+
+	public static function atLog($shopcode, $type, $ope, $memo = null)
+	{
+		//shop_code
+		//type
+		//operate
+		//memo
+		try {
+			$log = new OperateLog;
+			$log->shop_code = $shopcode;
+			$log->type = $type;
+			$log->operate = $ope;
+			$log->memo = $memo ? $memo : 'null';
+			$log->save();
+		} catch (\Exception $e) {
+			return $e->getError();
+		}
+	}
+
 
 	public static function makeCustomerCode()
 	{

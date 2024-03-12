@@ -10,6 +10,11 @@
 <body>
 
 <div class="container mt-5">
+	@if(session('msg'))
+    <div class="alert alert-success">
+        {{ session('msg') }}
+    </div>
+@endif
     <form action="{{ url('payment/newUser') }}" method="post" id="payment-form">
         @csrf
         <input type="hidden" name="code" value="{{ $shop->shop_code }}">
@@ -113,7 +118,6 @@
         // Submit the form
         form.submit();
     }
-</script>
 </script>
 
 </body>

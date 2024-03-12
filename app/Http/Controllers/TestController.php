@@ -24,7 +24,7 @@ class TestController extends Controller
 	{
 		$validatedData = $req->validate([
 			'name' => 'required', // nameは必須
-			'mailaddress' => 'required|email', // emailは必須であり、有効なメールアドレス形式であること
+			'mailaddress' => 'required|email', // emailは必須
 		]);
 
 		$stripeFanc = new \App\Lib\StripeFanc();

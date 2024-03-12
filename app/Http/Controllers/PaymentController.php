@@ -62,48 +62,47 @@ class PaymentController extends Controller
 	{
 		$validatedData = $req->validate([
 			'name' => 'required', // nameは必須
-			'mailaddress' => 'required|email', // emailは必須であり、有効なメールアドレス形式であること
+			'email' => 'required|email', // emailは必須であり
 			'amount' => 'required|integer',
 		]);
+		//"_token" => "lYPClMOAoEXeTsJTNjogCKDClX2umL6au4lRWBdc"
+		//  "code" => "6JUR"
+		//  "name" => "玉手箱"
+		//  "email" => "tamate@bako.com"
+		//  "amount" => "2500"
+		//  "stripeToken" => "tok_1Ot5zDJX4jQMJo2Wz5SWHCBF"
+		//]
 		try {
 			DB::beginTransaction();
 			$stripeFanc = new \App\Lib\StripeFanc();
-			$result = $stripeFanc->createCustomer(
-				$req->name,
-				$req->mailaddress,
-				[
-					'code' => $req->code
-				],
-				$req->stripeToken,
-			);
+			// 顧客制作
+			$result = $stripeFanc->createCustomer($req->name, $req->email);
+			// DB記録
 			$ccode = common::makeCustomerCode();
-			$cus = new customer;
-			$cus->shopCode = $req->code;
-			$cus->customer_id = $ccode;
-			$cus->name = $req->name;
-			$cus->email = $req->mailaddress;
-			$cus->save();
+			$adcus = common::addCustomerDB($req, $req->code, $ccode, $result->id, 'stripe', 'web');
 
-			$plc = new PlatCustomer;
-			$plc->customer_id = $ccode;
-			$plc->plat_name = 'stripe';
-			$plc->plat_id = $result->id;
-			$plc->save();
-
-			// operate log
-			$log = new OperateLog;
-			$log->shop_code = $req->code;
-			$log->type = 'web';
-			$log->operate = 'newUser&Payment';
-			$log->memo = $result->id;
-			$log->save();
+			// 顧客にカード情報ヒモ付け
+			$atcard = $stripeFanc->attachSetupIntents($req->code, $result->id, $req->input('stripeToken'));
+			DB::commit();
 
 			// 決済処理
-
-
+			DB::beginTransaction();
+			$paymentIntent = $stripeFanc->paymentIntent($req->code, $req->input('amount'), $result->id, $atcard->id);
+			if ($paymentIntent->status == 'succeeded') {
+				$pay = new payment;
+				$pay->shop_id = $req->code;
+				$pay->payment_log = $paymentIntent->id;
+				$pay->customer_id = $result->id;
+				$pay->amount = $req->input('amount');
+				$pay->save();
+				// operateLog記録
+				common::atLog($req->code, 'web', '決済処理:' . $req->input('amount') . ' ' . $result->id, $paymentIntent->id);
+			}
 			DB::commit();
+			return redirect()->back()->with('msg', '決済処理が完了しました。');
 		} catch (ApiErrorException $e) {
-			return response()->json(['success' => false, 'error' => $e->getMessage()]);
+			DB::rollBack();
+			return redirect()->back()->with('msg', '決済処理に失敗しました。' . $e->getMessage());
 		}
 	}
 }

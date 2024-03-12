@@ -2,6 +2,7 @@
 
 namespace App\Lib;
 
+use Illuminate\Support\Facades\DB;
 use \Stripe\StripeClient;
 use Stripe\PaymentIntent;
 use Stripe\PaymentMethod;
@@ -63,6 +64,20 @@ class StripeFanc
 		}
 	}
 
+	public function paymentIntent($shopcode, $amount, $customerId, $paymentMethodId)
+	{
+		$paymentIntent = $this->stripe->paymentIntents->create([
+			'amount' => $amount, // amount in JPY
+			'currency' => 'jpy',
+			'customer' => $customerId,
+			'payment_method' => $paymentMethodId,
+			'off_session' => true,
+			'confirm' => true,
+		]);
+
+		return $paymentIntent;
+	}
+
 	/**
 	 *取り消し処理
 	 * $chargeId: 決済ID 'pi_xxxxx' pi_から始まるID
@@ -88,24 +103,42 @@ class StripeFanc
 	}
 
 	// 単純にユーザー生成するだけ
-	public function createCustomer($name, $email, $source = null)
+	public function createCustomer($name, $email)
 	{
-		if ($source != null) {
-			$customer = $this->stripe->customers->create([
-				'name' => $name,
-				'email' => $email,
-				'source' => $source,
-			]);
-		} else {
-			$customer = $this->stripe->customers->create([
-				'name' => $name,
-				'email' => $email,
-			]);
-		}
-
-
+		$customer = $this->stripe->customers->create([
+			'name' => $name,
+			'email' => $email,
+		]);
 		//dd($customer);
 		return $customer;
+	}
+
+	// 顧客支払いヒモ付け
+	public function attachSetupIntents($shopCode, $customer_id, $stripeToken)
+	{
+		try {
+			$setupIntent = $this->stripe->setupIntents->create([
+				'customer' => $customer_id,
+				'payment_method_types' => ['card']
+			]);
+
+			$paymentMethod = $this->stripe->paymentMethods->create([
+				'type' => 'card',
+				'card' => ['token' => $stripeToken],
+			]);
+
+			// SetupIntentにPaymentMethodを関連付ける
+			$setupIntent = $this->stripe->setupIntents->confirm(
+				$setupIntent->id,
+				['payment_method' => $paymentMethod->id]
+			);
+			// operateLog記録
+			common::atLog($shopCode, 'web', '顧客＆カード制作', $setupIntent->id);
+
+			return $paymentMethod;
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			return 'Stripe API error: ' . $e->getMessage();
+		}
 	}
 
 	// 顧客を削除
