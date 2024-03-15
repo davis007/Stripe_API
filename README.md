@@ -21,6 +21,10 @@
 payment/{shopCode}/{amount}/{userType}/{userId}
 payment/6JUR/3500/newuser/
 
+[newuser]http://localhost:8000/payment/6JUR/2500/newuser
+[userPayment]http://localhost:8000/payment/6JUR/2500/userPayment
+[guest]http://localhost:8000/payment/6JUR/2500/guest
+
 {shopCode} 4 桁のショップコード
 
 {amount} 金額

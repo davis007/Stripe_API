@@ -13,6 +13,8 @@ use App\Models\User;
 use App\Models\customer;
 use App\Models\OperateLog;
 use App\Models\payment;
+use App\Models\PlatCustomer;
+use App\Models\PlatCard;
 use MyStripe;
 use common;
 
@@ -50,10 +52,14 @@ class PaymentController extends Controller
 				return view('payment.newuser', compact('shop', 'amount'));
 				break;
 			case 'userPayment':
-				$customer = customer::where('user_id', $userId)->first();
+				$customer = customer::where('customer_id', $userId)->first();
+				$platC = PlatCard::where('customer_id', $userId)->get();
+				//echo $customer . ' ' . $plat;
+				return view('payorder', compact('platC', 'customer', 'amount'));
 				break;
 			case 'guest':
-				$customer = customer::where('customer_code', $userId)->first();
+				$customer = $shop;
+				return view('payment.guestPayment', compact('shop', 'amount', 'userType', 'customer'));
 				break;
 		}
 	}
@@ -101,6 +107,32 @@ class PaymentController extends Controller
 			DB::commit();
 			return redirect()->back()->with('msg', '決済処理が完了しました。');
 		} catch (ApiErrorException $e) {
+			DB::rollBack();
+			return redirect()->back()->with('msg', '決済処理に失敗しました。' . $e->getMessage());
+		}
+	}
+
+	public function userPayment(Request $req)
+	{
+		//dd($req);
+		$cus  = customer::where('customer_id', $req->input('customer_id'))->first();
+		$pcus = PlatCustomer::where('customer_id', $req->input('customer_id'))->first();
+		$pcar = PlatCard::where('customer_id', $req->input('customer_id'))->first();
+		DB::beginTransaction();
+		$stripeFanc = new \App\Lib\StripeFanc();
+		$paymentIntent = $stripeFanc->payUser($req->input('amount'), $pcus->plat_id, $pcar->plat_card);
+		if ($paymentIntent->status == 'succeeded') {
+			$pay = new payment;
+			$pay->shop_id = $req->input('code');
+			$pay->payment_log = $paymentIntent->id;
+			$pay->customer_id = $pcus->plat_id;
+			$pay->amount = $req->input('amount');
+			$pay->save();
+			// operateLog記録
+			common::atLog($req->input('code'), 'web', '決済処理:' . $req->input('amount') . ' ' . $pcus->plat_id, $paymentIntent->id);
+			DB::commit();
+			return redirect()->back()->with('msg', '決済処理が完了しました。');
+		} else {
 			DB::rollBack();
 			return redirect()->back()->with('msg', '決済処理に失敗しました。' . $e->getMessage());
 		}

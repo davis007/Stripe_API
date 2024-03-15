@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Payment</title>
+	<title>Payment @if($userType == 'guest') GUEST決済 @else 会員決済 @endif</title>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 	<script src="https://js.stripe.com/v3/"></script>
 </head>

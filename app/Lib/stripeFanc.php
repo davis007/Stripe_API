@@ -25,12 +25,17 @@ class StripeFanc
 
 	public function cardToken($token)
 	{
-		$payCard = $this->stripe->paymentMethods->create([
-			'type' => 'card',
-			'card' => ['token' => $token],
-		]);
+		try {
+			$payCard = $this->stripe->paymentMethods->create([
+				'type' => 'card',
+				'card' => ['token' => $token],
+			]);
 
-		return $payCard;
+			return $payCard;
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			// エラーハンドリング
+			return 'S API error: ' . $e->getMessage();
+		}
 	}
 
 	/**
@@ -61,22 +66,27 @@ class StripeFanc
 			return $paymentIntent->id;
 		} catch (\Stripe\Exception\ApiErrorException $e) {
 			// エラーハンドリング
-			return 'Stripe API error: ' . $e->getMessage();
+			return 'S API error: ' . $e->getMessage();
 		}
 	}
 
 	public function paymentIntent($shopcode, $amount, $customerId, $paymentMethodId)
 	{
-		$paymentIntent = $this->stripe->paymentIntents->create([
-			'amount' => $amount, // amount in JPY
-			'currency' => 'jpy',
-			'customer' => $customerId,
-			'payment_method' => $paymentMethodId,
-			'off_session' => true,
-			'confirm' => true,
-		]);
+		try {
+			$paymentIntent = $this->stripe->paymentIntents->create([
+				'amount' => $amount, // amount in JPY
+				'currency' => 'jpy',
+				'customer' => $customerId,
+				'payment_method' => $paymentMethodId,
+				'off_session' => true,
+				'confirm' => true,
+			]);
 
-		return $paymentIntent;
+			return $paymentIntent;
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			// エラーハンドリング
+			return 'S API error: ' . $e->getMessage();
+		}
 	}
 
 	/**
@@ -94,24 +104,34 @@ class StripeFanc
 		if (is_null($reason)) {
 			$reason = '記載なし';
 		}
-		$refund = $this->stripe->refunds->create([
-			'payment_intent' => $chargeId,
-			'metadata' => ['reason' => $reason],
-		]);
+		try {
+			$refund = $this->stripe->refunds->create([
+				'payment_intent' => $chargeId,
+				'metadata' => ['reason' => $reason],
+			]);
 
-		//dd($refund);
-		return $refund;
+			//dd($refund);
+			return $refund;
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			// エラーハンドリング
+			return 'S API error: ' . $e->getMessage();
+		}
 	}
 
 	// 単純にユーザー生成するだけ
 	public function createCustomer($name, $email)
 	{
-		$customer = $this->stripe->customers->create([
-			'name' => $name,
-			'email' => $email,
-		]);
-		//dd($customer);
-		return $customer;
+		try {
+			$customer = $this->stripe->customers->create([
+				'name' => $name,
+				'email' => $email,
+			]);
+			//dd($customer);
+			return $customer;
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			// エラーハンドリング
+			return 'S API error: ' . $e->getMessage();
+		}
 	}
 
 	// 顧客支払いヒモ付け
@@ -150,6 +170,7 @@ class StripeFanc
 			$card->save();
 
 			$pcard = new PlatCard;
+			$pcard->customer_id = $ccode;
 			$pcard->card_id   = $cardc;
 			$pcard->plat_name = 'stripe';
 			$pcard->plat_card = $pid;
@@ -158,7 +179,7 @@ class StripeFanc
 			$pcard->exp_month = $exp_month;
 			$pcard->exp_year  = $exp_year;
 			$pcard->save();
-
+			common::atLog($shopCode, 'web', '顧客カード登録', $cardc);
 			return $paymentMethod;
 		} catch (\Stripe\Exception\ApiErrorException $e) {
 			return 'Stripe API error: ' . $e->getMessage();
@@ -169,21 +190,50 @@ class StripeFanc
 	//その顧客の有効なサブスクリプションも直ちにキャンセルされます。
 	public function deleteCustomer($customer_id)
 	{
-		$del = $this->stripe->customers->delete($customer_id, []);
-		return $del;
+		try {
+			$del = $this->stripe->customers->delete($customer_id, []);
+			common::atLog($shopCode, 'web', '顧客削除', $customer_id);
+			return $del;
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			// エラーハンドリング
+			return 'S API error: ' . $e->getMessage();
+		}
 	}
 
 	// ユーザー生成とカード割り当て
 	public function customerAndCard($name, $email, $source, $meta = null)
 	{
-		$customer = $this->stripe->customers->create([
-			'name' => $name,
-			'email' => $email,
-			'source' => $source,
-			['metadata' => $meta],
-		]);
+		try {
+			$customer = $this->stripe->customers->create([
+				'name' => $name,
+				'email' => $email,
+				'source' => $source,
+				['metadata' => $meta],
+			]);
 
-		//dd($customer);
-		return $customer;
+			//dd($customer);
+			return $customer;
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			// エラーハンドリング
+			return 'S API error: ' . $e->getMessage();
+		}
+	}
+
+	public function payUser($amount, $customerID, $paymentMethodId)
+	{
+		try {
+			$paymentIntent = $this->stripe->paymentIntents->create([
+				'amount' => $amount, // 金額(単位は最小単位、つまり円の場合は円)
+				'currency' => 'jpy', // 通貨コード
+				'customer' => $customerID, // ユーザーのCustomerID
+				'payment_method' => $paymentMethodId, // PaymentMethodのID
+				'off_session' => true, // サーバー側で処理するため、trueに設定
+				'confirm' => true, // 決済を確定するため、trueに設定
+			]);
+			return $paymentIntent;
+		} catch (\Stripe\Exception\ApiErrorException $e) {
+			// エラーハンドリング
+			return 'S API error: ' . $e->getMessage();
+		}
 	}
 }

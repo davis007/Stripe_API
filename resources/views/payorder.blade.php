@@ -1,84 +1,50 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>決済確認</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+	<div class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-md-8">
+				<div class="card">
+					<div class="card-header">
+						<h4>決済確認</h4>
+					</div>
+					<div class="card-body">
+						<form action="{{ url('payorder/payment') }}" method="post">
+							@csrf
+							<input type="hidden" name="code" value="{{ $customer->shopCode }}">
+							<input type="hidden" name="customer_id" value="{{ $customer->customer_id }}">
+							<div class="form-group">
+								<label for="amount">決済金額</label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="amount" name="amount" value="{{ $amount }}" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">円</span>
+									</div>
+								</div>
 
-@section('content')
-<div class="container">
-	<div class="row justify-content-center">
-		<div class="col-md-8">
-			<div class="card">
-				<div class="card-header">ポイント購入: {{ number_format('25000') }} (1ポイント=1円)</div>
-
-				<div class="card-body">
-					<form id="payment-form">
-						<div class="form-group row">
-							<label for="email" class="col-md-4 col-form-label text-md-right">{{ __('購入ポイント') }}</label>
-
-							<div class="col-md-6">
-								<input id="email" type="text" class="form-control" value="10,000 pt (1ポイント=1円)" readonly>
 							</div>
-						</div>
-
-						<div class="form-group row">
-							<label for="card-element" class="col-md-4 col-form-label text-md-right">{{ __('クレジットカード') }}</label>
-
-							<div class="col-md-6">
-								<div id="card-element"></div>
-								<div id="card-errors" role="alert"></div>
+							<div class="form-group">
+								<label for="card-number">カード選択</label>
+								@if($platC)
+									<select name="card_id" class="form-control">
+										@foreach($platC as $pl)
+											<option value="{{ $pl->card_id }}">{{ $pl->brand.' **** **** ****'.$pl->last4 }}</option>
+										@endforeach
+									</select>
+								@endif
 							</div>
-						</div>
-
-						<div class="form-group row mb-0">
-							<div class="col-md-6 offset-md-4">
-								<button type="submit" class="btn btn-primary" id="card-button" data-secret="hogehogehogehoge">
-									{{ __('購入する') }}
-								</button>
-							</div>
-							<div class="col-md-6">
-								<p>購入金額: 10,000円</p>
-							</div>
-						</div>
-					</form>
+							<button type="submit" class="btn btn-primary">決済する</button>
+						</form>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
-@endsection
-
-@push('scripts')
-<script src="https://js.stripe.com/v3/"></script>
-<script>
-	var stripe = Stripe('{{ env('STRIPE_KEY_TEST') }}');
-	var elements = stripe.elements();
-	var cardElement = elements.create('card');
-	cardElement.mount('#card-element');
-
-	var form = document.getElementById('payment-form');
-	var cardButton = document.getElementById('card-button');
-	var clientSecret = cardButton.dataset.secret;
-
-	form.addEventListener('submit', async (e) => {
-		e.preventDefault();
-
-		cardButton.disabled = true;
-
-		const { setupIntent, error } = await stripe.confirmCardPayment(
-			clientSecret, {
-				payment_method: {
-					card: cardElement,
-					billing_details: {
-						email: document.getElementById('email').value
-					}
-				}
-			}
-		);
-
-		if (error) {
-			cardButton.disabled = false;
-			document.getElementById('card-errors').textContent = error.message;
-		} else {
-			// Handle successful payment
-			window.location.replace('{{ url('/success') }}');
-		}
-	});
-</script>
-@endpush
+</body>
+</html>
