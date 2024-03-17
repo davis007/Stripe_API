@@ -23,8 +23,9 @@ Route::get('/', function () {
 });
 
 Route::get('payment/{shopCode}/{amount}/{userType}/{userId?}', [PaymentController::class, 'payment']);
-Route::post('payment/newUser', [PaymentController::class, 'newUser']);
-Route::post('payorder/payment', [PaymentController::class, 'userPayment']);
+Route::post('payment/newUser', [PaymentController::class, 'newUser'])->name('newUser');
+Route::post('payorder/payment', [PaymentController::class, 'userPayment'])->name('userPayment');
+Route::post('payment/guest', [PaymentController::class, 'paymentGuest'])->name('paymentGuest');
 
 Route::prefix('test')->group(function () {
 	Route::get('payment', [TestController::class, 'payment']);

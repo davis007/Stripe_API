@@ -54,7 +54,7 @@ class StripeFanc
 			$paymentIntent = $this->stripe->paymentIntents->create([
 				'amount' => $amount,
 				'currency' => 'jpy',
-				'payment_method' => $paymentMethod->id, // 作成されたPaymentMethodのIDを使用
+				'payment_method' => $paymentMethod->id,
 				'confirm' => true,
 				'automatic_payment_methods' => [
 					'enabled' => true,
@@ -63,10 +63,11 @@ class StripeFanc
 				'metadata' => $meta,
 			]);
 
-			return $paymentIntent->id;
+			//dd($paymentIntent);
+			return $paymentIntent;
 		} catch (\Stripe\Exception\ApiErrorException $e) {
 			// エラーハンドリング
-			return 'S API error: ' . $e->getMessage();
+			return ['error' => ['message' => $e->getMessage()]];
 		}
 	}
 

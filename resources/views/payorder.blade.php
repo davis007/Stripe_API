@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +15,7 @@
 						<h4>決済確認</h4>
 					</div>
 					<div class="card-body">
-						<form action="{{ url('payorder/payment') }}" method="post">
+						<form action="{{ route('userPayment') }}" method="post">
 							@csrf
 							<input type="hidden" name="code" value="{{ $customer->shopCode }}">
 							<input type="hidden" name="customer_id" value="{{ $customer->customer_id }}">

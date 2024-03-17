@@ -15,7 +15,7 @@
 				{{ session('msg') }}
 			</div>
 		@endif
-		<form action="{{ url('payment/newUser') }}" method="post" id="payment-form">
+		<form action="{{ route('newUser') }}" method="post" id="payment-form">
 			@csrf
 			<input type="hidden" name="code" value="{{ $shop->shop_code }}">
 

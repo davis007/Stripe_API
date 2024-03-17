@@ -54,6 +54,11 @@ class PaymentController extends Controller
 			case 'userPayment':
 				$customer = customer::where('customer_id', $userId)->first();
 				$platC = PlatCard::where('customer_id', $userId)->get();
+				if ($customer === null) {
+					return response()->json([
+						'error' => 'ユーザーデータが登録されていません。',
+					], 404);
+				}
 				//echo $customer . ' ' . $plat;
 				return view('payorder', compact('platC', 'customer', 'amount'));
 				break;
@@ -61,6 +66,35 @@ class PaymentController extends Controller
 				$customer = $shop;
 				return view('payment.guestPayment', compact('shop', 'amount', 'userType', 'customer'));
 				break;
+		}
+	}
+
+	public function paymentGuest(Request $req)
+	{
+		//dd($req);
+		$shop = User::where('shop_code', $req->code)->first();
+
+		if (!$shop) {
+			return response()->json([
+				'error' => 'ShopCode not found',
+			], 404);
+		}
+		$stripeFanc = new \App\Lib\StripeFanc();
+		$charge     = $stripeFanc->charge($req->stripeToken, $req->amount, ['payment' => 'ゲスト決済']);
+		//dd($charge, 'PaymentCont');
+
+		if ($charge->status == 'succeeded') {
+			$pay = new payment;
+			$pay->shop_id = $req->input('code');
+			$pay->payment_log = $charge['id'];
+			$pay->customer_id = 'guest';
+			$pay->amount = $req->input('amount');
+			$pay->save();
+
+			common::atLog($req->code, 'web', '決済処理:' . $req->input('amount') . ' guest決済', $charge['id']);
+			return redirect()->back()->with('msg', '決済処理が完了しました。');
+		} else {
+			return redirect()->back()->with('msg', '決済処理に失敗しました。');
 		}
 	}
 
