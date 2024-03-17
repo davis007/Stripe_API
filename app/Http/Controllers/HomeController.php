@@ -48,7 +48,7 @@ class HomeController extends Controller
 	public function apiLogs()
 	{
 		$user = Auth::user();
-		$logs = OperateLog::where('shop_code', $user->shop_code)->paginate(20);
+		$logs = OperateLog::where('shop_code', $user->shop_code)->orderBy('id', 'desc')->paginate(20);
 
 		return view('members.logs', compact('logs'));
 	}
@@ -111,7 +111,7 @@ class HomeController extends Controller
 	public function sales()
 	{
 		$user = User::find(Auth::user()->id)->first();
-		$sales = payment::where('shop_id', $user->shop_code)->paginate(20);
+		$sales = payment::where('shop_id', $user->shop_code)->orderBy('id', 'desc')->paginate(20);
 
 		return view('members.sales', compact('user', 'sales'));
 	}

@@ -76,18 +76,17 @@ class PaymentController extends Controller
 
 		if (!$shop) {
 			return response()->json([
-				'error' => 'ShopCode not found',
+				'error' => 'Code not found',
 			], 404);
 		}
 		$stripeFanc = new \App\Lib\StripeFanc();
 		$charge     = $stripeFanc->charge($req->stripeToken, $req->amount, ['payment' => 'ゲスト決済']);
-		//dd($charge, 'PaymentCont');
 
 		if ($charge->status == 'succeeded') {
 			$pay = new payment;
 			$pay->shop_id = $req->input('code');
 			$pay->payment_log = $charge['id'];
-			$pay->customer_id = 'guest';
+			$pay->customer_id = 'guest決済';
 			$pay->amount = $req->input('amount');
 			$pay->save();
 
