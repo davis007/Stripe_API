@@ -68,14 +68,23 @@
 	@yield('addSomething')
 	<script>
 		$(function () {
-			setTimeout(function () {
-				$('.alert').fadeOut();
-			}, 5000);
-		});
+    setTimeout(function () {
+        $('.alert:not(.alert-persistent)').fadeOut();
+    }, 5000);
+});
 
 		$(function () {
 			$('.confirm').click(function () {
 				if (!confirm('本当に削除しますか？')) {
+					/* キャンセルの時の処理 */
+					return false;
+				}
+			});
+		});
+
+		$(function () {
+			$('.confirms').click(function () {
+				if (!confirm('返金した場合は元に戻せません。返金しますか？')) {
 					/* キャンセルの時の処理 */
 					return false;
 				}

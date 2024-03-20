@@ -101,10 +101,7 @@ class StripeFanc
 	 **/
 	public function refund($chargeId, $reason = null)
 	{
-		$params = [];
-		if (is_null($reason)) {
-			$reason = '記載なし';
-		}
+		$reason = $reason ?? '顧客希望';
 		try {
 			$refund = $this->stripe->refunds->create([
 				'payment_intent' => $chargeId,

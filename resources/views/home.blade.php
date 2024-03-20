@@ -1,58 +1,40 @@
 @extends('layouts.app')
-@section('title','HOME')
+
 @section('content')
 <div class="container">
-	<div class="row justify-content-center">
-		<div class="col-md-12">
+	<div class="row">
+		<div class="col-md-6">
 			<div class="card bg-dark text-white">
-				<div class="card-header">HOME</div>
-
+				<div class="card-header">
+					<h5 class="card-title">売上情報</h5>
+				</div>
 				<div class="card-body">
-					@if(session('status'))
-						<div class="alert alert-success" role="alert">
-							{{ session('status') }}
-						</div>
-					@endif
-					<ul>
-						<li>基本情報:</li>
-						<li>email: {{ $user->email }}</li>
-						<li>shop_code: {{ $user->shop_code }}</li>
-						<li id="apiKey" onclick="copyToClipboard('{{ $user->api_key }}')">Api_Key: {{ $user->api_key }} <span class="badge badge-pill badge-primary">copy</span></li>
-						<li>売上: 348,500円</li>
-					</ul>
+					<p class="card-text">総売上金額: {{ number_format($total_sales) }}円</p>
+					<p class="card-text">総ユーザー数: {{ number_format($total_users) }}人</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6 mt-4 mt-md-0">
+			<div class="card bg-dark text-white">
+				<div class="card-header">
+					<h5 class="card-title">お知らせ</h5>
+				</div>
+				<div class="card-body">
+					<div class="alert alert-info">
+						<strong>新機能リリース</strong>
+						<p>新しい機能「カスタマイズ機能」をリリースしました。</p>
+					</div>
+					<div class="alert alert-info alert-persistent">
+						<strong>新機能リリース</strong>
+						<p>新しい機能「カスタマイズ機能」をリリースしました。</p>
+					</div>
+					<div class="alert alert-info alert-persistent">
+						<strong>サーバーメンテナンス</strong>
+						<p>4月1日(土) 0:00 ~ 6:00に、サーバーメンテナンスを実施します。</p>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-@endsection
-
-@section('addSomething')
-<style>
-.badge {
-	cursor: pointer;
-}
-</style>
-<script>
-	function copyToClipboard(text) {
-		// テキストエリアを動的に作成
-		var textarea = document.createElement("textarea");
-		textarea.textContent = text;
-		// スタイルを設定してページ上に表示されないようにする
-		textarea.style.position = "fixed"; // ページのスクロールを避ける
-		document.body.appendChild(textarea);
-		textarea.select(); // テキストを選択
-		try {
-			// コピーを試みる
-			document.execCommand("copy"); // コピー実行
-			alert("APIキーをクリップボードにコピーしました: " + text);
-		} catch (e) {
-			console.warn("コピーに失敗しました。", e);
-		}
-		// 作成したテキストエリアを削除
-		document.body.removeChild(textarea);
-	}
-
-</script>
-
 @endsection

@@ -43,6 +43,19 @@ class common
 		}
 	}
 
+	public static function cusName($cus_id)
+	{
+
+		$cus = PlatCustomer::where('plat_id', $cus_id)->first();
+		if ($cus != null) {
+			$ccus = customer::where('customer_id', $cus->customer_id)->first()->name;
+			return $ccus;
+		} else {
+			// 'cus_'から始まらない場合は、'cus_'を付加して返す
+			return 'guest決済';
+		}
+	}
+
 	public static function atLog($shopcode, $type, $ope, $memo = null)
 	{
 		//shop_code
