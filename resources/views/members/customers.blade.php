@@ -35,7 +35,7 @@
 							<td>{{ $cus->email }}</td>
 							<td>{{ $cus->created_at }}</td>
 							<td>
-								<a href="" class="btn btn-primary">詳細</a>
+								<a href="{{ url('customer/details/'.$cus->id) }}" class="btn btn-primary">詳細</a>
 								@if($cus->customer_id)
 								<a href="{{ url('delete/customer/'.$cus->customer_id) }}" class="btn btn-danger confirm ">削除</a>
 								@endif

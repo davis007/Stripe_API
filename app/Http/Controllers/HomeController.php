@@ -68,6 +68,13 @@ class HomeController extends Controller
 		return view('members.customers', compact('user', 'cust'));
 	}
 
+	public function custDeails($id)
+	{
+		$cus = customer::where('id', $id)->first();
+		$pay = payment::where('customer_id', $cus->customer_id)->get();
+		dd($cus, $pay);
+	}
+
 	public function addCustomer(Request $req)
 	{
 		$validatedData = $req->validate([

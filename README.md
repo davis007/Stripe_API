@@ -11,6 +11,7 @@
 1. 顧客一覧
 1. 顧客詳細
 1. 顧客削除
+1. カード登録
 1. カード登録＆顧客新規登録
 1. カード登録＆既存顧客関連付け
 1. 決済取消し(返金)
@@ -21,8 +22,8 @@
 payment/{shopCode}/{amount}/{userType}/{userId}
 payment/6JUR/3500/newuser/
 
-[newuser]http://localhost:8000/payment/6JUR/2500/newuser
-[userPayment]http://localhost:8000/payment/6JUR/2500/userPayment/cus_xO5lVAyA
+[newuser]http://localhost:8000/payment/BZHW/2500/newuser
+[userPayment]http://localhost:8000/payment/BZHW/2500/userPayment/cus_YI9NuxOm
 [guest]http://localhost:8000/payment/6JUR/2500/guest
 
 {shopCode} 4 桁のショップコード
