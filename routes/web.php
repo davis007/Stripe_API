@@ -26,6 +26,8 @@ Route::get('payment/{shopCode}/{amount}/{userType}/{userId?}', [PaymentControlle
 Route::post('payment/newUser', [PaymentController::class, 'newUser'])->name('newUser');
 Route::post('payorder/payment', [PaymentController::class, 'userPayment'])->name('userPayment');
 Route::post('payment/guest', [PaymentController::class, 'paymentGuest'])->name('paymentGuest');
+Route::get('register/{shopCode}/{userId}', [PaymentController::class, 'registCard']);
+Route::post('regist/card', [PaymentController::class, 'registerCard'])->name('registCard');
 
 Route::prefix('test')->group(function () {
 	Route::get('payment', [TestController::class, 'payment']);

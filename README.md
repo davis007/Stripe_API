@@ -21,10 +21,12 @@
 
 payment/{shopCode}/{amount}/{userType}/{userId}
 payment/6JUR/3500/newuser/
+register/BZHW/{userId}
 
 [newuser]http://localhost:8000/payment/BZHW/2500/newuser
 [userPayment]http://localhost:8000/payment/BZHW/2500/userPayment/cus_YI9NuxOm
-[guest]http://localhost:8000/payment/6JUR/2500/guest
+[guest]http://localhost:8000/payment/BZHW/2500/guest
+[registCard for Customer]http://localhost:8000/register/BZHW/{userId}
 
 {shopCode} 4 桁のショップコード
 

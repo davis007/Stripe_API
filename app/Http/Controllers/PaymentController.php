@@ -170,4 +170,36 @@ class PaymentController extends Controller
 			return redirect()->back()->with('msg', '決済処理に失敗しました。' . $e->getMessage());
 		}
 	}
+
+	public function registCard($shopCode, $userId)
+	{
+		//dd($shopCode, $userId);
+		$shop = User::where('shop_code', $shopCode)->first();
+		$cus  = customer::where('customer_id', $userId)->first();
+		$plt  = PlatCustomer::where('customer_id', $userId)->first();
+		if (!$shop) {
+			return response()->json([
+				'error' => 'Code not found',
+			], 404);
+		}
+		if (!$cus) {
+			return response()->json([
+				'error' => 'Code not found',
+			], 404);
+		}
+
+		return view('payment.registerCard', compact('shop', 'cus', 'plt'));
+	}
+
+	public function registerCard(Request $req)
+	{
+		$shop_code = $req->code;
+		$cust      = $req->cust;
+		$plt  = PlatCustomer::where('plat_id', $cust)->first();
+		$stripeFanc = new \App\Lib\StripeFanc();
+		DB::beginTransaction();
+		$atcard = $stripeFanc->attachSetupIntents($shop_code, $cust, $req->input('stripeToken'), $plt->customer_id);
+		DB::commit();
+		return redirect()->back()->with('msg', '正常にカードが登録されました。');
+	}
 }
