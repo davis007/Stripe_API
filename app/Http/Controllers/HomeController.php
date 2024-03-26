@@ -70,9 +70,11 @@ class HomeController extends Controller
 
 	public function custDeails($id)
 	{
-		$cus = customer::where('id', $id)->first();
-		$pay = payment::where('customer_id', $cus->customer_id)->get();
-		dd($cus, $pay);
+		$cus = Customer::find($id);
+		$plc = PlatCustomer::where('customer_id', $cus->customer_id)->first();
+		$pay = Payment::where('customer_id', $plc->plat_id)->orderBy('id', 'desc')->get();
+		//dd($cus, $pay);
+		return view('members.cusDetail', compact('cus', 'pay'));
 	}
 
 	public function addCustomer(Request $req)
