@@ -11,6 +11,7 @@ use App\Models\customer;
 use App\Models\OperateLog;
 use App\Models\payment;
 use App\Models\PlatCustomer;
+use App\Models\PlatCard;
 use MyStripe;
 use common;
 
@@ -73,8 +74,10 @@ class HomeController extends Controller
 		$cus = Customer::find($id);
 		$plc = PlatCustomer::where('customer_id', $cus->customer_id)->first();
 		$pay = Payment::where('customer_id', $plc->plat_id)->orderBy('id', 'desc')->get();
-		//dd($cus, $pay);
-		return view('members.cusDetail', compact('cus', 'pay'));
+		$pcd = PlatCard::where('customer_id', $cus->customer_id)->get();
+
+		//dd($cus, $pay,$pcd);
+		return view('members.cusDetail', compact('cus', 'pay', 'pcd'));
 	}
 
 	public function addCustomer(Request $req)

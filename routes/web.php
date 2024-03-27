@@ -17,6 +17,7 @@ use App\Http\Controllers\PaymentController as ControllersPaymentController;
 |
 */
 
+
 Auth::routes();
 Route::get('/', function () {
 	return view('welcome');

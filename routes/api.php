@@ -25,10 +25,12 @@ Route::get('payment', function () {
 Route::middleware('api_key')->group(function () {
 	// 認証テスト 成功するとmessage:Hello!が帰ってくる
 	Route::get('/hello', [ApiController::class, 'hello']);
-	// カード登録
-	// カード決済
+	// 顧客情報
+	Route::post('/customer/status/', [ApiController::class, 'customerStatus']);
 	// 顧客登録
 	Route::post('/registCustomer', [ApiController::class, 'registCustomer']);
-	// カード登録＆顧客新規登録
 	// 決済取消し(返金)
+
+	// 決済履歴一覧
+	Route::post('/payment/shop', [ApiController::class, 'shopPayments']);
 });

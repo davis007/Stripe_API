@@ -5,7 +5,9 @@
 	<div class="row justify-content-center">
 		<div class="col-md-12">
 			<div class="card bg-dark text-white">
-				<div class="card-header"><h2 class="h4">ユーザー情報詳細</h2></div>
+				<div class="card-header">
+					<h2 class="h4">ユーザー情報詳細</h2>
+				</div>
 				<div class="card-body">
 					@if(session('msg'))
 						<div class="alert alert-success" role="alert">
@@ -58,6 +60,39 @@
 							@endforeach
 						</tbody>
 					</table>
+					<h2 class="h4 mt-5">登録済みカード</h2>
+					@if(!empty($pcd))
+						<table class="table table-striped table-dark">
+							<thead>
+								<tr>
+									<th>CardID</th>
+									<th>PlateformName</th>
+									<th>PlatformCardID</th>
+									<th>Brand</th>
+									<th>Last4</th>
+									<th>ExpiryMonth</th>
+									<th>ExpiryYear</th>
+									<th>登録日</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach($pcd as $pcds)
+									<tr>
+										<td>{{ $pcds->card_id }}</td>
+										<td>{{ $pcds->plat_name }}</td>
+										<td>{{ $pcds->plat_card }}</td>
+										<td>{{ $pcds->brand }}</td>
+										<td>{{ $pcds->last4 }}</td>
+										<td>{{ $pcds->exp_month }}</td>
+										<td>{{ $pcds->exp_year }}</td>
+										<td>{{ $pcds->created_at->format('Y-m-d') }}</td>
+									</tr>
+								@endforeach
+							</tbody>
+						</table>
+					@else
+						<p>カードは登録されていません。</p>
+					@endif
 				</div>
 			</div>
 		</div>
